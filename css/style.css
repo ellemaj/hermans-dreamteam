@@ -71,8 +71,11 @@ h2 {
   white-space: nowrap;
 }
 
-.logo-icon {
-  font-size: 1.5rem;
+.logo-img {
+  height: 36px;
+  padding: 4px 8px;
+  background: white;
+  border-radius: 6px;
 }
 
 .main-nav {
@@ -214,6 +217,14 @@ h2 {
   height: 40px;
   background: radial-gradient(circle at 20px -10px, transparent 26px, rgba(255, 255, 255, 0.15) 27px) repeat-x;
   background-size: 40px 40px;
+}
+
+.hero-label {
+  margin: 0 0 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.85rem !important;
 }
 
 .hero h1 {
@@ -693,4 +704,18 @@ h2 {
   .hero {
     padding: 32px 20px;
   }
+}
+
+.place-category {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.map-marker {
+  background: var(--sea);
+  border: 2px solid white;
+  border-radius: 50%;
 }
