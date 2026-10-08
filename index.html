@@ -8,22 +8,21 @@
 
   <!-- Leaflet (map library) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌊</text></svg>" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
   <header class="site-header">
     <a href="#home" class="logo">
-      <span class="logo-icon">🌊</span>
-      <span>Walcheren <strong>Student Guide</strong></span>
+      <img src="img/hz-logo.svg" alt="HZ University of Applied Sciences" class="logo-img" />
+      <span>HZ <strong>Student Guide</strong></span>
     </a>
     <nav class="main-nav">
-      <a href="#home" data-nav="home">🏠 <span>Home</span></a>
-      <a href="#explore" data-nav="explore">🔎 <span>Explore</span></a>
-      <a href="#map" data-nav="map">🗺️ <span>Map</span></a>
-      <a href="#events" data-nav="events">📅 <span>Events</span></a>
-      <a href="#tips" data-nav="tips">💡 <span>Tips</span></a>
-      <a href="#quiz" data-nav="quiz">❓ <span>Quiz</span></a>
+      <a href="#home" data-nav="home">Home</a>
+      <a href="#explore" data-nav="explore">Explore</a>
+      <a href="#map" data-nav="map">Map</a>
+      <a href="#events" data-nav="events">Events</a>
+      <a href="#tips" data-nav="tips">Tips</a>
+      <a href="#quiz" data-nav="quiz">Quiz</a>
     </nav>
   </header>
 
@@ -31,6 +30,7 @@
     <!-- HOME -->
     <section id="page-home" class="page">
       <div class="hero">
+        <p class="hero-label">HZ University of Applied Sciences</p>
         <h1>Welcome to Vlissingen &amp; Middelburg!</h1>
         <p>
           New in Zeeland? This guide helps you find your way around, discover the best spots
@@ -51,6 +51,9 @@
         Many students live in one city and study in the other.
       </p>
 
+      <h2>Student stories</h2>
+      <div id="stories" class="tip-grid"></div>
+
       <h2>Random picks for you</h2>
       <div id="highlights" class="place-grid"></div>
     </section>
@@ -63,7 +66,7 @@
         <div class="chip-row" id="city-filter"></div>
         <div class="chip-row" id="category-filter"></div>
         <label class="checkbox">
-          <input type="checkbox" id="saved-only" /> Only show my saved places ❤️
+          <input type="checkbox" id="saved-only" /> Only show my saved places
         </label>
         <label class="checkbox">
           <input type="checkbox" id="free-only" /> Only free
@@ -129,7 +132,7 @@
     <!-- EVENTS -->
     <section id="page-events" class="page">
       <h1>Events through the year</h1>
-      <p class="muted">Dates change every year — always check the official website before you go.</p>
+      <p class="muted">Dates change every year, so always check the official website before you go.</p>
 
       <details class="add-form">
         <summary>Add your own event</summary>
@@ -181,7 +184,7 @@
   </main>
 
   <footer class="site-footer">
-    Made by Hermans Dreamteam · Information may change, check before you go.
+    HZ University of Applied Sciences · Made by HZ students (Hermans Dreamteam) · Information may change, check before you go.
   </footer>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>

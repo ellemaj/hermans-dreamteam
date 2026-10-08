@@ -108,17 +108,14 @@ function placeCard(place) {
 
   const card = document.createElement("article");
   card.className = "place-card";
-  card.style.setProperty("--accent", category.color);
   card.innerHTML = `
-    <div class="place-top">
-      <span class="badge" style="background:${category.color}">${category.icon} ${category.label}</span>
-      <button class="save-btn" aria-label="Save place" title="Save to my list">${isSaved ? "❤️" : "🤍"}</button>
-    </div>
+    <p class="place-category">${category.label}</p>
     <h3>${escapeHtml(place.name)}</h3>
-    <p class="place-meta">📍 ${city.name} · ${priceLabel(place.price)}${place.userAdded ? " · Added by you" : ""}</p>
+    <p class="place-meta">${city.name} · ${priceLabel(place.price)}${place.userAdded ? " · Added by you" : ""}</p>
     <p>${escapeHtml(place.description)}</p>
-    ${place.tip ? `<p class="place-tip">💡 ${escapeHtml(place.tip)}</p>` : ""}
+    ${place.tip ? `<p class="place-tip"><strong>Tip:</strong> ${escapeHtml(place.tip)}</p>` : ""}
     <div class="card-actions">
+      <button class="btn btn-small save-btn">${isSaved ? "Saved" : "Save"}</button>
       ${place.coords ? '<button class="btn btn-small map-btn">Show on map</button>' : ""}
       ${place.userAdded ? '<button class="btn btn-small btn-delete delete-btn">Delete</button>' : ""}
     </div>
@@ -158,6 +155,15 @@ function renderHome() {
     });
     container.appendChild(card);
   });
+
+  el("stories").innerHTML = STORIES.map(
+    (story) => `
+      <article class="tip">
+        <p>"${story.quote}"</p>
+        <h3>${story.name}</h3>
+        <p class="muted">${story.info} · <a href="${story.url}" target="_blank" rel="noopener">Read the story</a></p>
+      </article>`
+  ).join("");
 
   renderHighlights();
 }
@@ -201,7 +207,7 @@ function renderFilters() {
   );
   Object.entries(CATEGORIES).forEach(([key, cat]) => {
     categoryFilter.appendChild(
-      chip(`${cat.icon} ${cat.label}`, state.category === key, () => {
+      chip(cat.label, state.category === key, () => {
         state.category = key;
         renderExplore();
       })
@@ -235,7 +241,7 @@ function renderExplore() {
 
   if (places.length === 0) {
     list.innerHTML = `<p class="empty">No places found. Try another filter${
-      state.savedOnly ? " or save some places with the 🤍 button" : ""
+      state.savedOnly ? " or save some places with the Save button" : ""
     }.</p>`;
     return;
   }
@@ -265,9 +271,8 @@ function addMarker(place) {
   const category = CATEGORIES[place.category];
   const icon = L.divIcon({
     className: "map-marker",
-    html: `<span style="background:${category.color}">${category.icon}</span>`,
-    iconSize: [34, 34],
-    iconAnchor: [17, 17],
+    iconSize: [16, 16],
+    iconAnchor: [8, 8],
   });
   markers[place.id] = L.marker(place.coords, { icon })
     .addTo(map)
@@ -328,7 +333,7 @@ function renderEvents() {
       <div class="event-date">${event.month === 0 ? "Weekly" : monthNames[event.month]}</div>
       <div>
         <h3>${escapeHtml(event.name)} ${isNow ? '<span class="badge badge-now">This month</span>' : ""}</h3>
-        <p class="place-meta">🗓️ ${event.when} · 📍 ${cityLabel}${event.userAdded ? " · Added by you" : ""}</p>
+        <p class="place-meta">${event.when} · ${cityLabel}${event.userAdded ? " · Added by you" : ""}</p>
         <p>${escapeHtml(event.description)}</p>
         ${event.userAdded ? '<button class="btn btn-small btn-delete delete-btn">Delete</button>' : ""}
       </div>
@@ -482,7 +487,6 @@ function renderTips() {
   el("tip-list").innerHTML = TIPS.map(
     (tip) => `
       <article class="tip">
-        <div class="tip-icon">${tip.icon}</div>
         <h3>${tip.title}</h3>
         <p>${tip.text}</p>
       </article>`
@@ -505,9 +509,9 @@ function renderQuiz() {
 
   if (quiz.index >= QUIZ.length) {
     const percentage = quiz.score / QUIZ.length;
-    let message = "Time to go exploring! 🚲";
-    if (percentage === 1) message = "Perfect! You're a real Zeeuw already! 🏆";
-    else if (percentage >= 0.6) message = "Nice job, you know your way around! 🎉";
+    let message = "Time to go exploring!";
+    if (percentage === 1) message = "Perfect! You're a real Zeeuw already!";
+    else if (percentage >= 0.6) message = "Nice job, you know your way around!";
 
     container.innerHTML = `
       <h2>You scored ${quiz.score} / ${QUIZ.length}</h2>
@@ -558,7 +562,7 @@ function answerQuestion(choice) {
     else if (i === choice) button.classList.add("wrong");
   });
 
-  el("quiz-feedback").textContent = (correct ? "✅ Correct! " : "❌ Not quite. ") + q.explanation;
+  el("quiz-feedback").textContent = (correct ? "Correct! " : "Not quite. ") + q.explanation;
   const next = el("quiz-next");
   next.textContent = quiz.index === QUIZ.length - 1 ? "See my score" : "Next question";
   next.classList.remove("hidden");

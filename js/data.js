@@ -1,6 +1,6 @@
 // All content of the app lives in this file.
 // Want to add a place, event or tip? Just add an object to one of the lists below.
-// Coordinates are approximate [latitude, longitude] — good enough for a city map.
+// Coordinates are [latitude, longitude].
 
 const CITIES = {
   vlissingen: {
@@ -36,16 +36,59 @@ const CITIES = {
 };
 
 const CATEGORIES = {
-  sights:   { label: "Sights",          icon: "🏛️", color: "#7b4fbf" },
-  nature:   { label: "Beach & nature",  icon: "🏖️", color: "#1f9d8a" },
-  culture:  { label: "Culture & film",  icon: "🎭", color: "#d1495b" },
-  goingout: { label: "Food & going out", icon: "🍻", color: "#e08e0b" },
-  study:    { label: "Study spots",     icon: "📚", color: "#2e6fd8" },
-  sports:   { label: "Sports & active", icon: "🚴", color: "#3a9d3a" },
-  practical:{ label: "Practical",       icon: "🧭", color: "#5b6573" },
+  sights:   { label: "Sights" },
+  nature:   { label: "Beach & nature" },
+  culture:  { label: "Culture & film" },
+  goingout: { label: "Bars & cafés" },
+  cheapeats:{ label: "Cheap eats" },
+  supermarkets: { label: "Supermarkets" },
+  museums:  { label: "Museums" },
+  chill:    { label: "Chill spots" },
+  study:    { label: "Study spots" },
+  sports:   { label: "Sports & active" },
+  practical:{ label: "Practical" },
 };
 
+// Real quotes from HZ students, taken from hz.nl.
+const STORIES = [
+  {
+    name: "Saki",
+    info: "Exchange student from Japan, Tourism Management",
+    quote: "We spend a lot of time together. We hang out, we cook and we visit each other's rooms.",
+    url: "https://hz.nl/en/studentstories/why-japanese-exchange-student-saki-loves-studying-in-netherlands-at-hz",
+  },
+  {
+    name: "Ayden",
+    info: "Exchange student from Thailand, International Business",
+    quote: "It is very easy to make friends here. There is a strong international community where everyone knows each other.",
+    url: "https://hz.nl/en/studentstories/exchange-student-ayden-enjoys-every-minute-at-hz",
+  },
+  {
+    name: "Sullen",
+    info: "HZ student blogger",
+    quote: "It's small enough to get around easily by bike, but big enough to enjoy a lively student life.",
+    url: "https://hz.nl/en/blogs/study-abroad/student-life-in-vlissingen",
+  },
+];
+
 const PLACES = [
+  // ---------- New: supermarkets, cheap eats, bars, museums, chill spots (locations from OpenStreetMap) ----------
+  { id: "ah-vlissingen", name: "Albert Heijn Vlissingen centre", city: "vlissingen", category: "supermarkets", price: "€", coords: [51.44562, 3.57345], description: "Supermarket in the city centre, Aagje Dekenstraat 16.", tip: "House brand products are much cheaper than A-brands." },
+  { id: "lidl-vlissingen", name: "Lidl Vlissingen", city: "vlissingen", category: "supermarkets", price: "€", coords: [51.45278, 3.58569], description: "Budget supermarket at Mercuriusweg 16, a short walk from HZ Edisonweg. Jumbo is right next door." },
+  { id: "ah-middelburg", name: "Albert Heijn Middelburg", city: "middelburg", category: "supermarkets", price: "€", coords: [51.49628, 3.60763], description: "Supermarket at Pottenbakkerssingel 2, close to HZ Het Groene Woud." },
+  { id: "lidl-middelburg", name: "Lidl Middelburg", city: "middelburg", category: "supermarkets", price: "€", coords: [51.48584, 3.61828], description: "Budget supermarket at Johan van Reigersbergstraat 3, with a Jumbo next door." },
+  { id: "henks-viskraam", name: "Henk's Viskraam", city: "vlissingen", category: "cheapeats", price: "€", coords: [51.44071, 3.57475], description: "Fish stand on the De Ruyterplein. Grab some kibbeling and eat it on the boulevard." },
+  { id: "de-horizon", name: "De Horizon", city: "vlissingen", category: "cheapeats", price: "€", coords: [51.44281, 3.57661], description: "Snack bar at Walstraat 19 with kebab, fries and kibbeling." },
+  { id: "smoske-vlissingen", name: "'t Smoske", city: "vlissingen", category: "cheapeats", price: "€", coords: [51.44865, 3.58865], description: "Sandwich shop at Prins Hendrikweg 6, a few minutes from HZ Edisonweg." },
+  { id: "frites-markt", name: "Frites Snacks", city: "middelburg", category: "cheapeats", price: "€", coords: [51.49812, 3.61206], description: "Fries on the Markt, Markt 34." },
+  { id: "popeye", name: "Popeye", city: "vlissingen", category: "goingout", price: "€", coords: [51.44121, 3.57513], description: "Pub at Nieuwendijk 7, next to Bellamypark. Popular with HZ students." },
+  { id: "concurrent", name: "De Concurrent", city: "vlissingen", category: "goingout", price: "€", coords: [51.44163, 3.57426], description: "Pub right on Bellamypark (number 22)." },
+  { id: "seventy-seven", name: "Café Seventy-Seven", city: "middelburg", category: "goingout", price: "€", coords: [51.49834, 3.61053], description: "Café on the Markt (number 77), one of the most popular bars among students in Middelburg." },
+  { id: "plein1940", name: "Plein 1940", city: "middelburg", category: "goingout", price: "€€", coords: [51.4978, 3.6108], description: "Square next to the Markt with several bars, such as Bar Gaudi and De Vliegende Hollander." },
+  { id: "mercuur", name: "Museum ship Mercuur", city: "vlissingen", category: "museums", price: "€", coords: [51.44414, 3.57844], description: "Former navy minesweeper you can visit, Dok van Perry 43." },
+  { id: "sjakies", name: "Sjakie's Chocolate Museum", city: "middelburg", category: "museums", price: "€", coords: [51.49854, 3.60882], description: "Small museum about chocolate, from bean to bar. Vlasmarkt 51." },
+  { id: "abdijplein", name: "Abdijplein", city: "middelburg", category: "chill", price: "free", coords: [51.5005, 3.61472], description: "Quiet square inside the Abbey complex. Nice for sitting in the sun between classes." },
+
   // ---------- Vlissingen ----------
   {
     id: "boulevard",
@@ -57,7 +100,7 @@ const PLACES = [
     description:
       "The seaside boulevard of Vlissingen. Great for a walk, a run or watching the sunset " +
       "while giant container ships pass on their way to Antwerp.",
-    tip: "Come at sunset with some friends and snacks — it's free and beautiful.",
+    tip: "Come at sunset with some friends and snacks. It's free and beautiful.",
   },
   {
     id: "nollestrand",
@@ -69,7 +112,7 @@ const PLACES = [
     description:
       "Wide sandy beach at the western end of the boulevard, with the Nolledijk dunes behind it. " +
       "Popular with students in summer.",
-    tip: "Bring a windbreaker — even on sunny days the sea breeze can be strong.",
+    tip: "Bring a windbreaker. Even on sunny days the sea breeze can be strong.",
   },
   {
     id: "deruyter",
@@ -101,7 +144,7 @@ const PLACES = [
     category: "sights",
     price: "free",
     coords: [51.4418, 3.5628],
-    description: "A historic windmill along the boulevard — very Dutch, very photogenic.",
+    description: "A historic windmill along the boulevard. Very Dutch, very photogenic.",
   },
   {
     id: "muzeeum",
@@ -124,7 +167,7 @@ const PLACES = [
     description:
       "Green square in the old centre surrounded by bars, restaurants and terraces. " +
       "The place to be for drinks and a night out in Vlissingen.",
-    tip: "Many bars have special student nights — ask around during introduction week.",
+    tip: "Many bars have special student nights. Ask around during introduction week.",
   },
   {
     id: "cinecity",
@@ -134,7 +177,7 @@ const PLACES = [
     price: "€€",
     coords: [51.4470, 3.5815],
     description: "Big cinema with the latest blockbusters, often in original language with Dutch subtitles.",
-    tip: "Films are usually shown in English with Dutch subtitles — no dubbing!",
+    tip: "Films are usually shown in English with Dutch subtitles, no dubbing!",
   },
   {
     id: "hz",
@@ -145,7 +188,7 @@ const PLACES = [
     coords: [51.4500, 3.5855],
     description:
       "Main campus of HZ. Besides classes you'll find study spaces, a library and the canteen here.",
-    tip: "Find quiet study places in the library area during exam weeks — they fill up fast.",
+    tip: "Find quiet study places in the library area during exam weeks, they fill up fast.",
   },
   {
     id: "station-vlissingen",
@@ -183,7 +226,7 @@ const PLACES = [
     description:
       "The central square of Middelburg with its spectacular Gothic city hall (Stadhuis). " +
       "Surrounded by cafés and terraces.",
-    tip: "Every Thursday there is a big weekly market here — great for cheap fruit, cheese and fish.",
+    tip: "Every Thursday there is a big weekly market here. Great for cheap fruit, cheese and fish.",
   },
   {
     id: "abdij",
@@ -292,15 +335,15 @@ const PLACES = [
   // ---------- Around Walcheren ----------
   {
     id: "kanaal",
-    name: "Canal bike route Vlissingen–Middelburg",
+    name: "Canal bike route Vlissingen to Middelburg",
     city: "around",
     category: "sports",
     price: "free",
     coords: [51.4720, 3.6120],
     description:
       "The 'Kanaal door Walcheren' connects both cities. The cycle path next to it takes you " +
-      "from Vlissingen to Middelburg in about 20–25 minutes.",
-    tip: "Get a (second-hand) bike as soon as possible — it's how everyone gets around here.",
+      "from Vlissingen to Middelburg in about 20 to 25 minutes.",
+    tip: "Get a (second-hand) bike as soon as possible. It's how everyone gets around here.",
   },
   {
     id: "domburg",
@@ -334,7 +377,7 @@ const PLACES = [
   },
 ];
 
-// Recurring events. Exact dates change every year — always check the official website!
+// Recurring events. Exact dates change every year, always check the official website!
 const EVENTS = [
   {
     name: "Introduction week",
@@ -346,7 +389,7 @@ const EVENTS = [
   },
   {
     name: "Zeeland Nazomerfestival",
-    when: "Late August – early September",
+    when: "Late August to early September",
     month: 8,
     city: "middelburg",
     description:
@@ -365,7 +408,7 @@ const EVENTS = [
     month: 11,
     city: "both",
     description:
-      "Sinterklaas arrives by boat in the harbour. A very Dutch tradition — on 5 December people exchange gifts and poems.",
+      "Sinterklaas arrives by boat in the harbour. A very Dutch tradition: on 5 December people exchange gifts and poems.",
   },
   {
     name: "New Year's Eve",
@@ -400,7 +443,7 @@ const EVENTS = [
   },
   {
     name: "Mussel season",
-    when: "July – April",
+    when: "July to April",
     month: 7,
     city: "both",
     description:
@@ -417,53 +460,45 @@ const EVENTS = [
 
 const TIPS = [
   {
-    icon: "🚲",
     title: "Get a bike",
     text:
       "Cycling is the fastest way to get around. Buy a second-hand bike (check Marktplaats or local bike shops) " +
       "and always use two locks.",
   },
   {
-    icon: "🚆",
     title: "Trains & buses",
     text:
       "The train between Vlissingen and Middelburg takes only a few minutes. Tap in and out with your bank card " +
       "(OVpay) or an OV-chipkaart. Plan trips with the 9292 or NS app.",
   },
   {
-    icon: "🏛️",
     title: "Register at the municipality",
     text:
       "Staying longer than 4 months? Register at the municipality (gemeente) where you live within 5 days of arrival. " +
       "You'll get a BSN number, which you need for work, a bank account and the doctor.",
   },
   {
-    icon: "🩺",
     title: "Health & emergencies",
     text:
       "Emergency: call 112. Police (non-emergency): 0900-8844. Register with a GP (huisarts) near you. " +
       "If you get a job here, Dutch health insurance is mandatory.",
   },
   {
-    icon: "💳",
     title: "Paying",
     text:
       "Many shops and cafés only accept cards ('pinnen'). Make sure you have a debit card that works in the Netherlands.",
   },
   {
-    icon: "🌬️",
     title: "The weather",
     text:
-      "It's windy by the sea! A good rain jacket is worth more than an umbrella — umbrellas don't survive the wind here.",
+      "It's windy by the sea! A good rain jacket is worth more than an umbrella. Umbrellas don't survive the wind here.",
   },
   {
-    icon: "💸",
     title: "Save money",
     text:
       "Shop at the Thursday market in Middelburg, use the Too Good To Go app, buy supermarket house brands and always ask for student discount.",
   },
   {
-    icon: "🥐",
     title: "Taste Zeeland",
     text:
       "Try a 'Zeeuwse bolus' (sticky cinnamon pastry), fresh mussels and 'kibbeling' (fried fish) from a fish stand.",
@@ -510,7 +545,7 @@ const QUIZ = [
     question: "What was the old English name for Vlissingen?",
     answers: ["Fleetwood", "Flushing", "Flanders", "Fishing"],
     correct: 1,
-    explanation: "English sailors called it 'Flushing' — there's even a Flushing in New York named after it!",
+    explanation: "English sailors called it 'Flushing'. There's even a Flushing in New York named after it!",
   },
   {
     question: "On which day is the big weekly market in Middelburg?",
