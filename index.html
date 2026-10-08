@@ -69,6 +69,52 @@
           <input type="checkbox" id="free-only" /> Only free
         </label>
       </div>
+
+      <details class="add-form" id="place-form-details">
+        <summary>Add your own place</summary>
+        <form id="place-form">
+          <label>
+            Name
+            <input name="name" type="text" maxlength="80" required />
+          </label>
+          <div class="form-row">
+            <label>
+              Area
+              <select name="city">
+                <option value="vlissingen">Vlissingen</option>
+                <option value="middelburg">Middelburg</option>
+                <option value="around">Around Walcheren</option>
+              </select>
+            </label>
+            <label>
+              Category
+              <select name="category" id="place-category"></select>
+            </label>
+            <label>
+              Price
+              <select name="price">
+                <option value="free">Free</option>
+                <option value="€">€</option>
+                <option value="€€">€€</option>
+              </select>
+            </label>
+          </div>
+          <label>
+            Description
+            <textarea name="description" rows="3" maxlength="400" required></textarea>
+          </label>
+          <label>
+            Tip (optional)
+            <input name="tip" type="text" maxlength="200" />
+          </label>
+          <p class="form-label">Location (optional): click on the map</p>
+          <div id="picker-map"></div>
+          <p id="picker-status" class="muted">No location chosen. The place will not appear on the map.</p>
+          <button type="submit" class="btn btn-primary">Add place</button>
+          <p id="place-form-message" class="form-message"></p>
+        </form>
+      </details>
+
       <p id="result-count" class="muted"></p>
       <div id="place-list" class="place-grid"></div>
     </section>
@@ -84,6 +130,37 @@
     <section id="page-events" class="page">
       <h1>Events through the year</h1>
       <p class="muted">Dates change every year — always check the official website before you go.</p>
+
+      <details class="add-form">
+        <summary>Add your own event</summary>
+        <form id="event-form">
+          <label>
+            Name
+            <input name="name" type="text" maxlength="80" required />
+          </label>
+          <div class="form-row">
+            <label>
+              Date
+              <input name="date" type="date" required />
+            </label>
+            <label>
+              Where
+              <select name="city">
+                <option value="vlissingen">Vlissingen</option>
+                <option value="middelburg">Middelburg</option>
+                <option value="both">Vlissingen &amp; Middelburg</option>
+              </select>
+            </label>
+          </div>
+          <label>
+            Description
+            <textarea name="description" rows="3" maxlength="400" required></textarea>
+          </label>
+          <button type="submit" class="btn btn-primary">Add event</button>
+          <p id="event-form-message" class="form-message"></p>
+        </form>
+      </details>
+
       <div id="event-list" class="event-list"></div>
     </section>
 

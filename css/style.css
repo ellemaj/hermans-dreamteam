@@ -340,9 +340,19 @@ h2 {
   margin: 6px 0;
 }
 
-.place-card .map-btn {
+.card-actions {
+  display: flex;
+  gap: 8px;
   margin-top: auto;
-  align-self: flex-start;
+}
+
+.btn-delete {
+  background: #fde8eb;
+  color: #a12a3b;
+}
+
+.btn-delete:hover {
+  background: #f9d3d9;
 }
 
 .place-top {
@@ -382,6 +392,83 @@ h2 {
   text-align: center;
   color: var(--muted);
   padding: 40px 0;
+}
+
+/* ---------- Add forms ---------- */
+.add-form {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+}
+
+.add-form summary {
+  padding: 14px 16px;
+  font-weight: 600;
+  color: var(--sea);
+  cursor: pointer;
+}
+
+.add-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0 16px 16px;
+}
+
+.add-form label,
+.form-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.add-form input,
+.add-form select,
+.add-form textarea {
+  padding: 10px 12px;
+  font-size: 1rem;
+  font-family: inherit;
+  font-weight: normal;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: white;
+}
+
+.add-form input:focus,
+.add-form select:focus,
+.add-form textarea:focus {
+  outline: 2px solid var(--sea);
+  border-color: transparent;
+}
+
+.add-form .btn {
+  align-self: flex-start;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.form-message {
+  margin: 0;
+  color: var(--sea);
+  font-weight: 600;
+}
+
+#picker-map {
+  height: 260px;
+  border-radius: 10px;
+}
+
+#picker-status {
+  margin: 0;
+  font-size: 0.9rem;
 }
 
 /* ---------- Map ---------- */

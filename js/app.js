@@ -6,32 +6,51 @@ const state = {
   savedOnly: false,
   freeOnly: false,
   mapCity: "all",
-  saved: loadSaved(),
+  saved: new Set(readStorage("savedPlaces", [])),
+  // Places and events the user added themselves.
+  userContent: readStorage("userContent", { places: [], events: [] }),
 };
 
 let map = null;
 const markers = {}; // place id -> Leaflet marker
 
-// ---------- Saved places (stored in the browser) ----------
-function loadSaved() {
+let pickerMap = null;
+let pickerMarker = null;
+let pickedCoords = null;
+
+// ---------- Browser storage ----------
+function readStorage(key, fallback) {
   try {
-    return new Set(JSON.parse(localStorage.getItem("savedPlaces")) || []);
+    return JSON.parse(localStorage.getItem(key)) || fallback;
   } catch {
-    return new Set();
+    return fallback;
   }
 }
 
+function writeStorage(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // Storage not available (e.g. private mode): changes only last until the page reloads.
+  }
+}
+
+function allPlaces() {
+  return [...PLACES, ...state.userContent.places];
+}
+
+function allEvents() {
+  return [...EVENTS, ...state.userContent.events];
+}
+
+// ---------- Saved places ----------
 function toggleSaved(id) {
   if (state.saved.has(id)) {
     state.saved.delete(id);
   } else {
     state.saved.add(id);
   }
-  try {
-    localStorage.setItem("savedPlaces", JSON.stringify([...state.saved]));
-  } catch {
-    // Storage not available (e.g. private mode) — saving just won't persist.
-  }
+  writeStorage("savedPlaces", [...state.saved]);
   renderExplore();
   renderHighlights();
 }
@@ -96,13 +115,21 @@ function placeCard(place) {
       <button class="save-btn" aria-label="Save place" title="Save to my list">${isSaved ? "❤️" : "🤍"}</button>
     </div>
     <h3>${escapeHtml(place.name)}</h3>
-    <p class="place-meta">📍 ${city.name} · ${priceLabel(place.price)}</p>
+    <p class="place-meta">📍 ${city.name} · ${priceLabel(place.price)}${place.userAdded ? " · Added by you" : ""}</p>
     <p>${escapeHtml(place.description)}</p>
     ${place.tip ? `<p class="place-tip">💡 ${escapeHtml(place.tip)}</p>` : ""}
-    <button class="btn btn-small map-btn">Show on map</button>
+    <div class="card-actions">
+      ${place.coords ? '<button class="btn btn-small map-btn">Show on map</button>' : ""}
+      ${place.userAdded ? '<button class="btn btn-small btn-delete delete-btn">Delete</button>' : ""}
+    </div>
   `;
   card.querySelector(".save-btn").addEventListener("click", () => toggleSaved(place.id));
-  card.querySelector(".map-btn").addEventListener("click", () => showOnMap(place.id));
+  if (place.coords) {
+    card.querySelector(".map-btn").addEventListener("click", () => showOnMap(place.id));
+  }
+  if (place.userAdded) {
+    card.querySelector(".delete-btn").addEventListener("click", () => deletePlace(place.id));
+  }
   return card;
 }
 
@@ -113,7 +140,7 @@ function renderHome() {
 
   ["vlissingen", "middelburg"].forEach((key) => {
     const city = CITIES[key];
-    const count = PLACES.filter((p) => p.city === key).length;
+    const count = allPlaces().filter((p) => p.city === key).length;
     const card = document.createElement("article");
     card.className = "city-card city-" + key;
     card.innerHTML = `
@@ -139,12 +166,15 @@ function renderHighlights() {
   const container = el("highlights");
   if (!container.dataset.ids) {
     // Pick 3 random places once per visit.
-    const shuffled = [...PLACES].sort(() => Math.random() - 0.5);
+    const shuffled = allPlaces().sort(() => Math.random() - 0.5);
     container.dataset.ids = shuffled.slice(0, 3).map((p) => p.id).join(",");
   }
   const ids = container.dataset.ids.split(",");
   container.innerHTML = "";
-  ids.forEach((id) => container.appendChild(placeCard(PLACES.find((p) => p.id === id))));
+  // A picked place may have been deleted by the user in the meantime.
+  allPlaces()
+    .filter((p) => ids.includes(p.id))
+    .forEach((place) => container.appendChild(placeCard(place)));
 }
 
 // ---------- Explore ----------
@@ -181,7 +211,7 @@ function renderFilters() {
 
 function filteredPlaces() {
   const search = state.search.toLowerCase();
-  return PLACES.filter((place) => {
+  return allPlaces().filter((place) => {
     if (state.city !== "all" && place.city !== state.city) return false;
     if (state.category !== "all" && place.category !== state.category) return false;
     if (state.savedOnly && !state.saved.has(place.id)) return false;
@@ -217,29 +247,35 @@ function initMap() {
   if (map) return;
 
   map = L.map("leaflet-map").setView([51.47, 3.59], 12);
+  addTiles(map);
+  allPlaces().forEach(addMarker);
+  renderMapFilter();
+}
+
+function addTiles(leafletMap) {
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     maxZoom: 19,
-  }).addTo(map);
+  }).addTo(leafletMap);
+}
 
-  PLACES.forEach((place) => {
-    const category = CATEGORIES[place.category];
-    const icon = L.divIcon({
-      className: "map-marker",
-      html: `<span style="background:${category.color}">${category.icon}</span>`,
-      iconSize: [34, 34],
-      iconAnchor: [17, 17],
-    });
-    markers[place.id] = L.marker(place.coords, { icon })
-      .addTo(map)
-      .bindPopup(
-        `<strong>${escapeHtml(place.name)}</strong><br>` +
-          `<small>${category.label} · ${priceLabel(place.price)}</small><br>` +
-          escapeHtml(place.description)
-      );
+function addMarker(place) {
+  if (!map || !place.coords) return;
+
+  const category = CATEGORIES[place.category];
+  const icon = L.divIcon({
+    className: "map-marker",
+    html: `<span style="background:${category.color}">${category.icon}</span>`,
+    iconSize: [34, 34],
+    iconAnchor: [17, 17],
   });
-
-  renderMapFilter();
+  markers[place.id] = L.marker(place.coords, { icon })
+    .addTo(map)
+    .bindPopup(
+      `<strong>${escapeHtml(place.name)}</strong><br>` +
+        `<small>${category.label} · ${priceLabel(place.price)}</small><br>` +
+        escapeHtml(place.description)
+    );
 }
 
 function renderMapFilter() {
@@ -264,7 +300,7 @@ function renderMapFilter() {
 function showOnMap(id) {
   location.hash = "map";
   initMap();
-  const place = PLACES.find((p) => p.id === id);
+  const place = allPlaces().find((p) => p.id === id);
   setTimeout(() => {
     map.invalidateSize();
     map.setView(place.coords, 16);
@@ -279,7 +315,7 @@ function renderEvents() {
 
   // Sort events so the upcoming ones come first. Weekly events (month 0) go on top.
   const monthsAway = (month) => (month === 0 ? -1 : (month - currentMonth + 12) % 12);
-  const events = [...EVENTS].sort((a, b) => monthsAway(a.month) - monthsAway(b.month));
+  const events = allEvents().sort((a, b) => monthsAway(a.month) - monthsAway(b.month));
 
   const list = el("event-list");
   list.innerHTML = "";
@@ -292,12 +328,153 @@ function renderEvents() {
       <div class="event-date">${event.month === 0 ? "Weekly" : monthNames[event.month]}</div>
       <div>
         <h3>${escapeHtml(event.name)} ${isNow ? '<span class="badge badge-now">This month</span>' : ""}</h3>
-        <p class="place-meta">🗓️ ${event.when} · 📍 ${cityLabel}</p>
+        <p class="place-meta">🗓️ ${event.when} · 📍 ${cityLabel}${event.userAdded ? " · Added by you" : ""}</p>
         <p>${escapeHtml(event.description)}</p>
+        ${event.userAdded ? '<button class="btn btn-small btn-delete delete-btn">Delete</button>' : ""}
       </div>
     `;
+    if (event.userAdded) {
+      item.querySelector(".delete-btn").addEventListener("click", () => deleteEvent(event.id));
+    }
     list.appendChild(item);
   });
+}
+
+// ---------- Adding your own places and events ----------
+function initPickerMap() {
+  if (pickerMap) return;
+
+  pickerMap = L.map("picker-map").setView([51.47, 3.59], 12);
+  addTiles(pickerMap);
+  pickerMap.on("click", (e) => {
+    pickedCoords = [e.latlng.lat, e.latlng.lng];
+    if (pickerMarker) {
+      pickerMarker.setLatLng(e.latlng);
+    } else {
+      pickerMarker = L.marker(e.latlng).addTo(pickerMap);
+    }
+    el("picker-status").textContent = "Location chosen. Click again to move it.";
+  });
+}
+
+function resetPicker() {
+  pickedCoords = null;
+  if (pickerMarker) {
+    pickerMarker.remove();
+    pickerMarker = null;
+  }
+  el("picker-status").textContent = "No location chosen. The place will not appear on the map.";
+}
+
+function setupPlaceForm() {
+  el("place-category").innerHTML = Object.entries(CATEGORIES)
+    .map(([key, cat]) => `<option value="${key}">${cat.label}</option>`)
+    .join("");
+
+  // The picker map can only be drawn once the <details> is open and has a size.
+  el("place-form-details").addEventListener("toggle", (e) => {
+    if (!e.target.open) return;
+    initPickerMap();
+    pickerMap.invalidateSize();
+  });
+
+  el("place-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const data = new FormData(form);
+    const name = data.get("name").trim();
+    const description = data.get("description").trim();
+
+    if (!name || !description) {
+      el("place-form-message").textContent = "Please fill in a name and a description.";
+      return;
+    }
+
+    const place = {
+      id: "user-" + Date.now(),
+      name,
+      city: data.get("city"),
+      category: data.get("category"),
+      price: data.get("price"),
+      coords: pickedCoords,
+      description,
+      tip: data.get("tip").trim(),
+      userAdded: true,
+    };
+    state.userContent.places.push(place);
+    writeStorage("userContent", state.userContent);
+
+    addMarker(place);
+    form.reset();
+    resetPicker();
+    el("place-form-message").textContent = `"${name}" was added.`;
+    renderHome();
+    renderExplore();
+  });
+}
+
+function setupEventForm() {
+  el("event-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const data = new FormData(form);
+    const name = data.get("name").trim();
+    const description = data.get("description").trim();
+    const date = data.get("date");
+
+    if (!name || !description || !date) {
+      el("event-form-message").textContent = "Please fill in a name, a date and a description.";
+      return;
+    }
+
+    // Add a time so the "YYYY-MM-DD" date is read as local time instead of UTC.
+    const when = new Date(date + "T00:00").toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+
+    state.userContent.events.push({
+      id: "user-" + Date.now(),
+      name,
+      when,
+      month: Number(date.slice(5, 7)),
+      city: data.get("city"),
+      description,
+      userAdded: true,
+    });
+    writeStorage("userContent", state.userContent);
+
+    form.reset();
+    el("event-form-message").textContent = `"${name}" was added.`;
+    renderEvents();
+  });
+}
+
+function deletePlace(id) {
+  if (!confirm("Delete this place?")) return;
+
+  state.userContent.places = state.userContent.places.filter((p) => p.id !== id);
+  writeStorage("userContent", state.userContent);
+
+  if (state.saved.has(id)) {
+    state.saved.delete(id);
+    writeStorage("savedPlaces", [...state.saved]);
+  }
+  if (markers[id]) {
+    markers[id].remove();
+    delete markers[id];
+  }
+  renderHome();
+  renderExplore();
+}
+
+function deleteEvent(id) {
+  if (!confirm("Delete this event?")) return;
+
+  state.userContent.events = state.userContent.events.filter((e) => e.id !== id);
+  writeStorage("userContent", state.userContent);
+  renderEvents();
 }
 
 // ---------- Tips ----------
@@ -400,6 +577,9 @@ el("free-only").addEventListener("change", (e) => {
   state.freeOnly = e.target.checked;
   renderExplore();
 });
+
+setupPlaceForm();
+setupEventForm();
 
 renderHome();
 renderExplore();
