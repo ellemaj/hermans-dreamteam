@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Walcheren Student Guide</title>
+  <meta name="description" content="Discover Vlissingen and Middelburg as a new international student." />
+
+  <!-- Leaflet (map library) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌊</text></svg>" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <a href="#home" class="logo">
+      <span class="logo-icon">🌊</span>
+      <span>Walcheren <strong>Student Guide</strong></span>
+    </a>
+    <nav class="main-nav">
+      <a href="#home" data-nav="home">🏠 <span>Home</span></a>
+      <a href="#explore" data-nav="explore">🔎 <span>Explore</span></a>
+      <a href="#map" data-nav="map">🗺️ <span>Map</span></a>
+      <a href="#events" data-nav="events">📅 <span>Events</span></a>
+      <a href="#tips" data-nav="tips">💡 <span>Tips</span></a>
+      <a href="#quiz" data-nav="quiz">❓ <span>Quiz</span></a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- HOME -->
+    <section id="page-home" class="page">
+      <div class="hero">
+        <h1>Welcome to Vlissingen &amp; Middelburg!</h1>
+        <p>
+          New in Zeeland? This guide helps you find your way around, discover the best spots
+          and see what there is to do as a student.
+        </p>
+        <div class="hero-buttons">
+          <a href="#explore" class="btn btn-primary">Start exploring</a>
+          <a href="#quiz" class="btn btn-light">Test your knowledge</a>
+        </div>
+      </div>
+
+      <h2>Two cities, one island</h2>
+      <div id="city-cards" class="city-cards"></div>
+
+      <h2>Did you know?</h2>
+      <p class="muted">
+        Vlissingen and Middelburg are only 6 km apart: about 20 minutes by bike or a few minutes by train.
+        Many students live in one city and study in the other.
+      </p>
+
+      <h2>Random picks for you</h2>
+      <div id="highlights" class="place-grid"></div>
+    </section>
+
+    <!-- EXPLORE -->
+    <section id="page-explore" class="page">
+      <h1>Explore</h1>
+      <div class="filters">
+        <input id="search" type="search" placeholder="Search places..." aria-label="Search places" />
+        <div class="chip-row" id="city-filter"></div>
+        <div class="chip-row" id="category-filter"></div>
+        <label class="checkbox">
+          <input type="checkbox" id="saved-only" /> Only show my saved places ❤️
+        </label>
+        <label class="checkbox">
+          <input type="checkbox" id="free-only" /> Only free
+        </label>
+      </div>
+      <p id="result-count" class="muted"></p>
+      <div id="place-list" class="place-grid"></div>
+    </section>
+
+    <!-- MAP -->
+    <section id="page-map" class="page">
+      <h1>Map</h1>
+      <div class="chip-row" id="map-filter"></div>
+      <div id="leaflet-map"></div>
+    </section>
+
+    <!-- EVENTS -->
+    <section id="page-events" class="page">
+      <h1>Events through the year</h1>
+      <p class="muted">Dates change every year — always check the official website before you go.</p>
+      <div id="event-list" class="event-list"></div>
+    </section>
+
+    <!-- TIPS -->
+    <section id="page-tips" class="page">
+      <h1>Survival tips</h1>
+      <div id="tip-list" class="tip-grid"></div>
+
+      <h2>Speak a little Dutch</h2>
+      <div id="phrase-list" class="phrase-list"></div>
+    </section>
+
+    <!-- QUIZ -->
+    <section id="page-quiz" class="page">
+      <h1>How well do you know Walcheren?</h1>
+      <div id="quiz" class="quiz-card"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    Made by Hermans Dreamteam · Information may change, check before you go.
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
