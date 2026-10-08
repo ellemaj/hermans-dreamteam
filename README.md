@@ -11,8 +11,13 @@ en ontdekken wat er voor studenten te doen is. De app zelf is in het Engels.
 
 - **Home**: introductie van beide steden en een paar willekeurige tips
 - **Explore**: alle plekken, te filteren op stad, categorie, zoekterm en "gratis"; plekken opslaan met ❤️ (blijft bewaard in de browser)
+- **Eigen plekken toevoegen**: via "Add your own place" op Explore, met optioneel een locatie op de kaart
 - **Map**: interactieve kaart met alle plekken
 - **Events**: jaarlijkse evenementen, gesorteerd vanaf de huidige maand
+- **Eigen events toevoegen**: via "Add your own event" op Events
+
+Zelf toegevoegde plekken en events worden alleen in de eigen browser opgeslagen (`localStorage`).
+Andere gebruikers zien ze dus niet, en ze verdwijnen als je de browsergegevens wist.
 - **Tips**: praktische tips (fiets, OV, inschrijven gemeente, ...) en Nederlandse basiszinnen
 - **Quiz**: test je kennis over Walcheren
 
